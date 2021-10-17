@@ -17,22 +17,26 @@ const Rating = sequelize.define("rating", {
 User.hasMany(Rating, {
   foreignKey: {
     name: "masterId",
+    allowNull: false,
   },
 });
 Rating.belongsTo(User, {
   foreignKey: {
     name: "masterId",
+    allowNull: false,
   },
 });
 
 User.hasMany(Rating, {
   foreignKey: {
     name: "guestId",
+    allowNull: false,
   },
 });
 Rating.belongsTo(User, {
   foreignKey: {
     name: "guestId",
+    allowNull: false,
   },
 });
 

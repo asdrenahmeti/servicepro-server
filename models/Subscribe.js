@@ -9,11 +9,11 @@ const Subscribe = sequelize.define("subscribe", {
     autoIncrement: true,
   },
   from: {
-    type: Sequelize.STRING,
+    type: Sequelize.DATEONLY,
     allowNull: false,
   },
   to: {
-    type: Sequelize.STRING,
+    type: Sequelize.DATEONLY,
     allowNull: false,
   },
 });

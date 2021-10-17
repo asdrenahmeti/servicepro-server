@@ -8,7 +8,7 @@ const Job_image = sequelize.define("job_image", {
     primaryKey: true,
     autoIncrement: true,
   },
-  name: {
+  img_url: {
     type: Sequelize.STRING,
     allowNull: false,
   },
