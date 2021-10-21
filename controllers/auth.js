@@ -13,13 +13,13 @@ const Sequelize = require("sequelize")
 const Op = Sequelize.Op
 
 exports.register = catchAsync(async (req, res, next) => {
-  let validatorRes = showValidatorResult(req.body, userValidator);
-  if (!validatorRes.is_valid) {
-    return res.status(400).json({
-      status: "fail",
-      message: validatorRes.errors,
-    });
-  }
+  // let validatorRes = showValidatorResult(req.body, userValidator);
+  // if (!validatorRes.is_valid) {
+  //   return res.status(400).json({
+  //     status: "fail",
+  //     message: validatorRes.errors,
+  //   });
+  // }
   let { name, username, email, password, confirmPassword, phone } = req.body;
   if (password !== confirmPassword) {
     return res.status(400).json({
@@ -43,11 +43,10 @@ exports.register = catchAsync(async (req, res, next) => {
 
 exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
-  console.log("Start");
   if (!email || !password) {
     console.log("Exist");
     return next(
-      new AppError("Please provide email or username and password!", 400)
+      new AppError("Please provide email and password!", 400)
     );
   }
   const user = await modUser.findOne({
@@ -102,7 +101,7 @@ exports.restrictTo = (...roles) => {
 };
 
 exports.forgotPassword = catchAsync(async (req, res, next) => {
-  const user = await User.findOne({
+  const user = await modUser.findOne({
     where: {
       email: req.body.email,
     },
@@ -177,5 +176,5 @@ exports.resetPassword = catchAsync(async (req, res,next)=>{
 })
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-    
+
 });

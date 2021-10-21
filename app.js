@@ -64,9 +64,9 @@ app.all("*", (req, res, next) => {
 app.use(globalErrorHandler);
 
 // catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
+// app.use(function (req, res, next) {
+//   next(createError(404));
+// });
 
 // // error handler
 // app.use(function (err, req, res, next) {
@@ -79,5 +79,5 @@ app.use(function (req, res, next) {
 //   res.render("error");
 // });
 
-sequelize.sync({alter: false});
+sequelize.sync({force: true});
 module.exports = app;

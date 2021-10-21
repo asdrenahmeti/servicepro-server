@@ -3,7 +3,7 @@ const en = {
     name: "Name is required!",
     username: "Username is required!",
     email_empty: "Email is required!",
-    email_format: "This email is not valid",
+    email_format: "Incorrect email format",
     pass_empty: "Password is required!",
     pass_length: "Password must contain at least 6 characters!",
     phone: "Phone is required!",

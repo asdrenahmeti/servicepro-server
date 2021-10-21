@@ -25,6 +25,6 @@
     "npm": "^7.6.3",
     "pug": "2.0.0-beta11",
     "sequelize": "4.38.0",
-    "validator": "13.5.2"
+    "validator": "^13.5.2"
   }
 }
