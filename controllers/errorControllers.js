@@ -4,7 +4,7 @@ const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
     error: err,
-    message: err.errors,
+    message: err.message,
     stack: err.stack,
   });
 };
@@ -14,18 +14,16 @@ const sendErrorProd = (err, res) => {
       status: err.status,
       message: err.message,
     });
-  } else {
-    console.log("ERROR.....: ", err);
-    res.status(500).json({
-      status: "error",
-      message: "Something went very wrong!",
-    });
   }
 };
 
 const handleUniqueConstraintErrorDB = (err) => {
   const message = err.errors[0].message;
   return new AppError(message, 400);
+};
+
+const operationalErrorHandler = (err) => {
+  return err;
 };
 
 const handleSequelizeErrorDB = (err) => {
@@ -47,6 +45,9 @@ module.exports = (err, req, res, next) => {
     sendErrorDev(err, res);
   } else {
     let error = { ...err };
+    if (err.isOperational) {
+      error = operationalErrorHandler(err);
+    }
     if (error.name === "SequelizeUniqueConstraintError") {
       error = handleUniqueConstraintErrorDB(error);
     }

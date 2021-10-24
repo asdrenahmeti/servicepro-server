@@ -11,7 +11,7 @@ const sequelize = require("./db/db_connection");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorControllers");
 const catchAsync = require("./utils/catchAsync");
-// "start": "node ./bin/www"
+
 
 // import middleweares
 var app = express();
@@ -36,27 +36,14 @@ const modSubscribe = require("./models/Subscribe");
 const modJob = require("./models/Job");
 const modJobRequest = require("./models/Job_request");
 const modJobImage = require("./models/Job_image");
-// TEST MODEL
-const showValidatorResult = require("./validators/showValidatorResult");
-const userValidator = require("./validators/user_validator");
-const auth = require("./routes/auth");
-const { protect } = require("./controllers/auth");
 
-app.post("/adduser", (req, res) => {
-  console.log("REQQQQ: ", req.body);
-
-  let validatorRes = showValidatorResult(req.body, userValidator);
-  if (!validatorRes.is_valid) {
-    res.send(validatorRes.errors);
-    return;
-  }
-  res.send("mire");
-});
 
 // import Routes
+const userRoutes = require("./routes/userRoutes")
+const auth = require("./routes/auth");
 
 
-
+app.use("/api/user", userRoutes);
 app.use("/api", auth);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -75,9 +62,9 @@ app.use(globalErrorHandler);
 //   res.locals.error = req.app.get("env") === "development" ? err : {};
 
 //   // render the error page
-//   res.status(err.status || 500);
+//   res.status(err.status || 500); 
 //   res.render("error");
 // });
 
-sequelize.sync({force: true});
+sequelize.sync({force: false});
 module.exports = app;

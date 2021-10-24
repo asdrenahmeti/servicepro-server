@@ -12,6 +12,15 @@ const sendEmail = require("./../utils/email");
 const Sequelize = require("sequelize")
 const Op = Sequelize.Op
 
+const createSendToken = (user, status, res)=>{
+  const token = JWT.sign({ id: user.id }, process.env.JWT_SECRET);
+  res.status(status).json({
+    status: "success",
+    token,
+    user,
+  });
+}
+
 exports.register = catchAsync(async (req, res, next) => {
   // let validatorRes = showValidatorResult(req.body, userValidator);
   // if (!validatorRes.is_valid) {
@@ -20,25 +29,13 @@ exports.register = catchAsync(async (req, res, next) => {
   //     message: validatorRes.errors,
   //   });
   // }
-  let { name, username, email, password, confirmPassword, phone } = req.body;
+  let {password, confirmPassword} = req.body;
   if (password !== confirmPassword) {
-    return res.status(400).json({
-      status: "fail",
-      message: "Password did not match ",
-    });
+    return next(new AppError("Password did not match!", 400));
   }
-  password = bcrypt.hashSync(password, 12);
-  let newUser = await modUser.create({
-    name,
-    username,
-    email,
-    password,
-    phone,
-  });
-  res.status(200).json({
-    status: "success",
-    data: newUser,
-  });
+ const hashPassword = bcrypt.hashSync(password, 12);
+  let user = await modUser.create({...req.body, password: hashPassword});
+  createSendToken(user, 201, res);
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -57,11 +54,7 @@ exports.login = catchAsync(async (req, res, next) => {
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return next(new AppError("Incorrent email or password", 401));
   }
-  const token = JWT.sign({ id: user.id }, process.env.JWT_SECRET);
-  res.status(200).json({
-    status: "succes",
-    token,
-  });
+  createSendToken(user, 200, res);
 });
 
 exports.protect = catchAsync(async (req, res, next) => {
@@ -71,7 +64,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     return next(
-      AppError("You are not logged in! Please log in to get access.", 401)
+      new AppError("You are not logged in! Please log in to get access.", 401)
     );
   }
   const decoded = await promisify(JWT.verify)(token, process.env.JWT_SECRET);
@@ -167,14 +160,24 @@ exports.resetPassword = catchAsync(async (req, res,next)=>{
 
   await user.save()
 
-  const token = JWT.sign({ id: user.id }, process.env.JWT_SECRET);
-
-  res.status(200).json({
-      status: 'success',
-      token,
-  })
+ createSendToken(user, 200, res);
 })
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-
+  let {oldPassword, newPassword, confirmPassword} = req.body
+  if (!oldPassword || !newPassword || !newPassword) {
+     return next(new AppError("Please provide old password and new password!", 400));
+  }
+  if (newPassword !== confirmPassword) {
+    return next(new AppError("Passwords are not the same!", 400));
+  }
+  const user = await modUser.findOne({
+    where: {
+      id: req.user.id
+    }
+  })
+  if (!bcrypt.compareSync(oldPassword, user.password)) {
+    return next(new AppError("Old password it's not correct!", 400));
+  }
+  createSendToken(user, 200, res);
 });

@@ -32,7 +32,7 @@ const en = {
   rating: {
     masterId: "MasterId is required!",
     guestId: "GuestId is required!",
-    rating_value: "Rating valueis required!",
+    rating_value: "Rating values required!",
     rating_value_data: "Rating value must be between 1 to 5",
   },
   job: {

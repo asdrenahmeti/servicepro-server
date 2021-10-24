@@ -7,12 +7,14 @@ const {
   restrictTo,
   forgotPassword,
   resetPassword,
+  updatePassword,
 } = require("./../controllers/auth");
 
 router.post("/register",register)
 router.post("/login", login);
 router.post("/forgotPassword", forgotPassword );
 router.patch("/resetPassword/:token", resetPassword);
+router.patch("/updateMyPassword",protect, updatePassword);
 
 
 router.get("/protect",protect,(req, res)=>{

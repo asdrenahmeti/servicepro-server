@@ -4,7 +4,7 @@ const guestData = "Guest Data";
 const errMessages = require("./../validators/messages");
 const AppError = require("./../utils/appError")
 const validator = require("validator");
-let allowNullRes;
+
 
 const User = sequelize.define("user", {
   id: {
@@ -50,29 +50,51 @@ const User = sequelize.define("user", {
   },
   city: {
     type: Sequelize.STRING,
-    allowNull:true,
-    validate:{
-      isGuest(value){
-        if(value === null && this.role !== "GUEST"){
-          throw new AppError("City is required!", 400)
+    allowNull: false,
+    defaultValue: guestData,
+    validate: {
+      ifIsNull(value) {
+        if (value === "Guest Data" && this.role !== "GUEST") {
+          throw new AppError(errMessages.en.user.city, 401);
         }
-      }
-    }
+      },
+    },
   },
   zip_code: {
     type: Sequelize.STRING,
     allowNull: false,
     defaultValue: guestData,
+    validate: {
+      ifIsNull(value) {
+        if (value === "Guest Data" && this.role !== "GUEST") {
+          throw new AppError(errMessages.en.user.zip_code, 401);
+        }
+      },
+    },
   },
   country: {
     type: Sequelize.STRING,
     allowNull: false,
     defaultValue: guestData,
+    validate: {
+      ifIsNull(value) {
+        if (value === "Guest Data" && this.role !== "GUEST") {
+          throw new AppError(errMessages.en.user.country, 401);
+        }
+      },
+    },
   },
   adress: {
     type: Sequelize.STRING,
     allowNull: false,
     defaultValue: guestData,
+    validate: {
+      ifIsNull(value) {
+        if (value === "Guest Data" && this.role !== "GUEST") {
+          throw new AppError(errMessages.en.user.adress, 401);
+        }
+      },
+    },
   },
   phone: {
     type: Sequelize.STRING,
@@ -98,5 +120,6 @@ const User = sequelize.define("user", {
     type: Sequelize.DATE,
   },
 });
+
 
 module.exports = User;
