@@ -106,8 +106,8 @@ const User = sequelize.define("user", {
   },
   img_url: {
     type: Sequelize.STRING,
+    defaultValue: "default.jpg"
   },
-
   membership: {
     type: Sequelize.BOOLEAN,
     defaultValue: false,
@@ -119,6 +119,10 @@ const User = sequelize.define("user", {
   passwordResetExpires: {
     type: Sequelize.DATE,
   },
+  active: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: true
+  }
 });
 
 

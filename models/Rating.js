@@ -28,14 +28,25 @@ const Rating = sequelize.define(
         },
       },
     },
+    rating_quote: {
+      type: Sequelize.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: {
+          msg: errMessages.en.rating.rating_quote,
+        },
+        len: {
+          args: [20, 200],
+          msg: errMessages.en.rating.rating_quote_length,
+        },
+      },
+    },
   },
   {
     indexes: [
       {
-        unique: {
-          args: true,
-          msg: "you have already rated this worker!",
-        },
+        unique: true,
+        msg: "you have already add this service!",
         fields: ["masterId", "guestId"],
       },
     ],

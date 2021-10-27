@@ -5,6 +5,7 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var multer = require("multer");
 const bcrypt = require("bcrypt");
+const rateLimit = require("express-rate-limit")
 
 const Sequelize = require("sequelize");
 const sequelize = require("./db/db_connection");
@@ -15,11 +16,15 @@ const catchAsync = require("./utils/catchAsync");
 
 // import middleweares
 var app = express();
-
+const limiter = rateLimit({
+  max:100,
+  windowMs: 60*60*1000,
+  message: "To many request from this IP, please try again in an hour!"
+})
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-
+app.use("/api", limiter)
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -66,5 +71,5 @@ app.use(globalErrorHandler);
 //   res.render("error");
 // });
 
-sequelize.sync({force: false});
+sequelize.sync();
 module.exports = app;

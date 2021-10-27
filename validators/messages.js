@@ -34,11 +34,15 @@ const en = {
     guestId: "GuestId is required!",
     rating_value: "Rating values required!",
     rating_value_data: "Rating value must be between 1 to 5",
+    rating_quote: "Rating message is required!",
+    rating_quote_length:
+      "The text must have a minimum of 20 letters and a maximum of 200",
   },
   job: {
     title: "Title is required!",
     description: "Description is required!",
     userId: "UserId is required!",
+    price: "Price is required!"
   },
   job_request: {
     title: "Title is required!",

@@ -40,7 +40,7 @@ module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || "error";
 
-  let development = true;
+  let development = false;
   if (development) {
     sendErrorDev(err, res);
   } else {

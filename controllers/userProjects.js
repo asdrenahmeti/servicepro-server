@@ -1,0 +1,90 @@
+const AppError = require("./../utils/appError");
+const catchAsync = require("../utils/catchAsync");
+const multer = require("multer");
+const sharp = require("sharp");
+const sequelize = require("./../db/db_connection")
+const { transaction } = require("../db/db_connection");
+const modJob = require("./../models/Job");
+const modJobImage = require("./../models/Job_image");
+
+
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith("image")) {
+    cb(null, true);
+  } else {
+    cb(new AppError("Not an image! Please upload only images.", 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter,
+});
+
+exports.uploadProjectPhotos = upload.fields([
+  {
+    name: "img_url",
+    maxCount: 10,
+  },
+]);
+
+exports.resizeProjectPhotos = catchAsync(async (req, res, next) => {
+  if (!req.files.img_url) return next();
+  req.body.img_url = [];
+  await Promise.all(
+    req.files.img_url.map(async (file, i) => {
+      const filename = `project-${req.user.id}-${Date.now()}-${i + 1}.jpeg`;
+      await sharp(file.buffer)
+        .resize(500, 500)
+        .toFormat("jpeg")
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/work/${filename}`);
+
+      req.body.img_url.push(filename);
+    })
+  );
+  next();
+});
+
+exports.addNewProject = catchAsync(async (req, res, next) => {
+  const t = await sequelize.transaction();
+  try {
+    const project = await modJob.create({ ...req.body, userId: req.user.id },{transaction: t});
+    const jobImageObj = await req.body.img_url.map((next) => {
+      return { img_url: next, jobId: project.id};
+    });
+    const project_images = await modJobImage.bulkCreate(jobImageObj, {
+      transaction: t,
+    });
+    t.commit()
+    res.status(200).json({
+      status: "success",
+      data: project,
+      images: req.body.img_url,
+    });
+  } catch (error) { 
+    await t.rollback()
+    return next(new AppError("Something went wrong!", 400))
+  }
+});
+
+exports.getMyProjects= catchAsync(async(req, res, next)=>{
+  const data = await modJob.findAll({
+    where:{userId: req.user.id},
+    attributes: ["id","title","description","price"],
+    include: [
+      {
+        model: modJobImage,
+        attributes: ["img_url"],
+      },
+    ],
+  });
+
+  res.status(200).json({
+    status: "success",
+    data
+  })
+})
+

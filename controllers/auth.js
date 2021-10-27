@@ -9,17 +9,17 @@ const modUser = require("./../models/User");
 const AppError = require("./../utils/appError");
 const crypto = require("crypto");
 const sendEmail = require("./../utils/email");
-const Sequelize = require("sequelize")
-const Op = Sequelize.Op
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 
-const createSendToken = (user, status, res)=>{
+const createSendToken = (user, status, res) => {
   const token = JWT.sign({ id: user.id }, process.env.JWT_SECRET);
   res.status(status).json({
     status: "success",
     token,
     user,
   });
-}
+};
 
 exports.register = catchAsync(async (req, res, next) => {
   // let validatorRes = showValidatorResult(req.body, userValidator);
@@ -29,12 +29,15 @@ exports.register = catchAsync(async (req, res, next) => {
   //     message: validatorRes.errors,
   //   });
   // }
-  let {password, confirmPassword} = req.body;
+
+  let { password, confirmPassword } = req.body;
   if (password !== confirmPassword) {
     return next(new AppError("Password did not match!", 400));
   }
- const hashPassword = bcrypt.hashSync(password, 12);
-  let user = await modUser.create({...req.body, password: hashPassword});
+  const hashPassword = bcrypt.hashSync(password, 12);
+  let user = await modUser.create({ ...req.body, password: hashPassword });
+  user.password =undefined
+  user.active=undefined
   createSendToken(user, 201, res);
 });
 
@@ -42,9 +45,7 @@ exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
     console.log("Exist");
-    return next(
-      new AppError("Please provide email and password!", 400)
-    );
+    return next(new AppError("Please provide email and password!", 400));
   }
   const user = await modUser.findOne({
     where: {
@@ -53,6 +54,9 @@ exports.login = catchAsync(async (req, res, next) => {
   });
   if (!user || !bcrypt.compareSync(password, user.password)) {
     return next(new AppError("Incorrent email or password", 401));
+  }
+  if (!user.active) {
+    return next(new AppError("Account is not active!", 401));
   }
   createSendToken(user, 200, res);
 });
@@ -123,10 +127,10 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
       message,
     });
   } catch (err) {
-      user.passwordResetToken = undefined
-      user.passwordResetExpires = undefined
-      await user.save()
-      return next(new AppError("There was an error sending the email", 500))
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+    return next(new AppError("There was an error sending the email", 500));
   }
 
   res.status(200).json({
@@ -135,7 +139,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.resetPassword = catchAsync(async (req, res,next)=>{
+exports.resetPassword = catchAsync(async (req, res, next) => {
   const hashedToken = crypto
     .createHash("sha256")
     .update(req.params.token)
@@ -148,34 +152,36 @@ exports.resetPassword = catchAsync(async (req, res,next)=>{
       },
     },
   });
-  if(!user){
-      return next(new AppError("Token is invalid or has expired",400))
+  if (!user) {
+    return next(new AppError("Token is invalid or has expired", 400));
   }
   if (req.body.password !== req.body.confirmPassword) {
     return next(new AppError("Please confirm password!", 400));
   }
-  user.password = bcrypt.hashSync(req.body.password,12)
-  user.passwordResetToken= undefined
+  user.password = bcrypt.hashSync(req.body.password, 12);
+  user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;
 
-  await user.save()
+  await user.save();
 
- createSendToken(user, 200, res);
-})
+  createSendToken(user, 200, res);
+});
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-  let {oldPassword, newPassword, confirmPassword} = req.body
+  let { oldPassword, newPassword, confirmPassword } = req.body;
   if (!oldPassword || !newPassword || !newPassword) {
-     return next(new AppError("Please provide old password and new password!", 400));
+    return next(
+      new AppError("Please provide old password and new password!", 400)
+    );
   }
   if (newPassword !== confirmPassword) {
     return next(new AppError("Passwords are not the same!", 400));
   }
   const user = await modUser.findOne({
     where: {
-      id: req.user.id
-    }
-  })
+      id: req.user.id,
+    },
+  });
   if (!bcrypt.compareSync(oldPassword, user.password)) {
     return next(new AppError("Old password it's not correct!", 400));
   }

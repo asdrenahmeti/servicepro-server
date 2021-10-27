@@ -3,13 +3,27 @@ const sequelize = require("./../db/db_connection");
 const Service = require("./Service");
 const User = require("./User");
 
-const User_service = sequelize.define("user_service", {
-  id: {
-    type: Sequelize.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
+const User_service = sequelize.define(
+  "user_service",
+  {
+    id: {
+      type: Sequelize.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+    },
   },
-});
+  {
+    indexes: [
+      {
+        unique: {
+          args: true,
+          msg: "you have already rated this worker!",
+        },
+        fields: ["userId", "serviceId"],
+      },
+    ],
+  }
+);
 
 User.hasMany(User_service)
 User_service.belongsTo(User)
