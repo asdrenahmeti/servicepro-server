@@ -1,0 +1,23 @@
+openapi: 3.0.0
+info:
+  title: Service Pro API
+  description: API made for Service Pro
+  version: 1.0.0
+servers:
+  url: http://localhost:3000/api/
+security:
+  bearerAuth: []
+paths:
+  /register:
+    post:
+      tags:
+        Authorization
+      summary: Register for a new account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+              

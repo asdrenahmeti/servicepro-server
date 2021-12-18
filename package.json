@@ -28,6 +28,9 @@
     "sequelize": "4.38.0",
     "sharp": "^0.29.2",
     "stripe": "^8.194.0",
-    "validator": "^13.5.2"
+    "validator": "^13.5.2",
+    "swagger-ui-express": "^4.3.0",
+    "validator": "^13.5.2",
+    "yamljs": "^0.3.0"
   }
 }

@@ -5,7 +5,9 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 var multer = require("multer");
 const bcrypt = require("bcrypt");
-const rateLimit = require("express-rate-limit")
+const rateLimit = require("express-rate-limit");
+const swaggerUI = require("swagger-ui-express");
+const YAML = require("yamljs");
 
 const Sequelize = require("sequelize");
 const sequelize = require("./db/db_connection");
@@ -13,18 +15,20 @@ const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorControllers");
 const catchAsync = require("./utils/catchAsync");
 
-
 // import middleweares
 var app = express();
 const limiter = rateLimit({
-  max:100,
-  windowMs: 60*60*1000,
-  message: "To many request from this IP, please try again in an hour!"
-})
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: "To many request from this IP, please try again in an hour!",
+});
+
+const swaggerDocument = YAML.load("./utils/swagger.yaml");
+
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
-app.use("/api", limiter)
+app.use("/api", limiter);
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -42,13 +46,12 @@ const modJob = require("./models/Job");
 const modJobRequest = require("./models/Job_request");
 const modJobImage = require("./models/Job_image");
 
-
 // import Routes
-const userRoutes = require("./routes/userRoutes")
+const userRoutes = require("./routes/userRoutes");
 const auth = require("./routes/auth");
 const subscribeRoutes = require("./routes/subscribeRoutes");
 
-
+app.use("/", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use("/api/user", userRoutes);
 app.use("/api/subscribe", subscribeRoutes);
 app.use("/api", auth);
@@ -69,7 +72,7 @@ app.use(globalErrorHandler);
 //   res.locals.error = req.app.get("env") === "development" ? err : {};
 
 //   // render the error page
-//   res.status(err.status || 500); 
+//   res.status(err.status || 500);
 //   res.render("error");
 // });
 
