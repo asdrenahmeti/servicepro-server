@@ -51,7 +51,7 @@ const userRoutes = require("./routes/userRoutes");
 const auth = require("./routes/auth");
 const subscribeRoutes = require("./routes/subscribeRoutes");
 
-app.use("/", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
+app.use("/documentation", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use("/api/user", userRoutes);
 app.use("/api/subscribe", subscribeRoutes);
 app.use("/api", auth);
