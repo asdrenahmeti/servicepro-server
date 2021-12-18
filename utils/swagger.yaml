@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: Service Pro API
+  description: API made for Service Pro
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /login:
+    post:
+      tags:
+        - Authorization
+      summary: Login using an existing account
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: foo@bar.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: success
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjNhMGQ4Njg3LWRjODgtNDIyMy05MjA3LTJhMjQ0OGE1MmIyNiIsImlhdCI6MTYzOTg2MTY0Nn0.0pAPpECK4YHsBwY9Xfuy
+                  user:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: 3a0d8687-dc88-4223-9207-2a2448a52b2
+                      role:
+                        type: string
+                        example: GUEST
+                      name:
+                        type: string
+                        example: John Doe
+                      username:
+                        type: string
+                        example: JohnDoe133
+                      email:
+                        type: string
+                        example: johndoe133@gmail.com
+        "400":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Please provide email and password !
+        "401":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Incorrect email or password !
+        "500":
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: string
+                    example: fail
+                  message:
+                    type: string
+                    example: Something went wrong !
