@@ -22,7 +22,9 @@ const {
   uploadProjectPhotos,
   resizeProjectPhotos,
   getMyProjects,
+  removeProjectById,
 } = require("../controllers/userProjects");
+const { requestJob, requestJobsByUserId, acceptJobRequest, declineJobRequest } = require("../controllers/jobRequest");
 
 const upload = multer({ dest: "public/img/users" });
 
@@ -54,6 +56,12 @@ router.post(
   addNewProject
 );
 router.get("/getMyProjects", protect, getMyProjects)
+router.delete("/post/:id", protect, removeProjectById)
 
+// Job Request
+router.post("/newRequest", requestJob)
+router.get("/requestJobs/:id",requestJobsByUserId)
+router.patch("/acceptJob/:id", protect, acceptJobRequest)
+router.patch("/declineJob/:id", protect, declineJobRequest);
 
 module.exports = router;

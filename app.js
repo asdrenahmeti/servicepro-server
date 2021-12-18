@@ -46,9 +46,11 @@ const modJobImage = require("./models/Job_image");
 // import Routes
 const userRoutes = require("./routes/userRoutes")
 const auth = require("./routes/auth");
+const subscribeRoutes = require("./routes/subscribeRoutes");
 
 
 app.use("/api/user", userRoutes);
+app.use("/api/subscribe", subscribeRoutes);
 app.use("/api", auth);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -11,10 +11,11 @@ const sendEmail = async options =>{
     });
 
     let mailOptions = {
-      from: "shkumbinbajrami91@gmail.com",
-      to: options.email,
+      from: options.from,
+      to: options.to,
       subject: options.subject,
       text: options.message,
+      html: options.html
     };
 
     await transporter.sendMail(mailOptions)

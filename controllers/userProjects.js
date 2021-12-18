@@ -88,3 +88,21 @@ exports.getMyProjects= catchAsync(async(req, res, next)=>{
   })
 })
 
+exports.removeProjectById = catchAsync(async(req, res, next)=>{
+  const project = await modJob.findOne({
+    where:{
+      id:req.params.id
+    }
+  })
+  if (!project) {
+    return next(new AppError("There is no project with this Id", 400))
+  }
+  if(project.userId !== req.user.id){
+    return next(new AppError("You can only delete your projects", 400));
+  }
+  await project.destroy()
+  res.status(200).json({
+    status: "success",
+    message: "The project was successfully deleted",
+  });
+})
