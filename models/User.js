@@ -2,9 +2,8 @@ const Sequelize = require("sequelize");
 const sequelize = require("./../db/db_connection");
 const guestData = "Guest Data";
 const errMessages = require("./../validators/messages");
-const AppError = require("./../utils/appError")
+const AppError = require("./../utils/appError");
 const validator = require("validator");
-
 
 const User = sequelize.define("user", {
   id: {
@@ -106,7 +105,7 @@ const User = sequelize.define("user", {
   },
   img_url: {
     type: Sequelize.STRING,
-    defaultValue: "default.jpg"
+    defaultValue: "default.jpg",
   },
   membership: {
     type: Sequelize.BOOLEAN,
@@ -121,9 +120,11 @@ const User = sequelize.define("user", {
   },
   active: {
     type: Sequelize.BOOLEAN,
-    defaultValue: true
-  }
+    defaultValue: true,
+  },
+  bio: {
+    type: Sequelize.STRING,
+  },
 });
-
 
 module.exports = User;

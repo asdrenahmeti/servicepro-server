@@ -2,11 +2,10 @@ const AppError = require("./../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 const multer = require("multer");
 const sharp = require("sharp");
-const sequelize = require("./../db/db_connection")
+const sequelize = require("./../db/db_connection");
 const { transaction } = require("../db/db_connection");
 const modJob = require("./../models/Job");
 const modJobImage = require("./../models/Job_image");
-
 
 const multerStorage = multer.memoryStorage();
 
@@ -51,29 +50,37 @@ exports.resizeProjectPhotos = catchAsync(async (req, res, next) => {
 exports.addNewProject = catchAsync(async (req, res, next) => {
   const t = await sequelize.transaction();
   try {
-    const project = await modJob.create({ ...req.body, userId: req.user.id },{transaction: t});
+    const project = await modJob.create(
+      { ...req.body, userId: req.user.id },
+      { transaction: t }
+    );
     const jobImageObj = await req.body.img_url.map((next) => {
-      return { img_url: next, jobId: project.id};
+      return { img_url: next, jobId: project.id };
     });
     const project_images = await modJobImage.bulkCreate(jobImageObj, {
       transaction: t,
     });
-    t.commit()
+    t.commit();
     res.status(200).json({
       status: "success",
       data: project,
       images: req.body.img_url,
     });
-  } catch (error) { 
-    await t.rollback()
-    return next(new AppError("Something went wrong!", 400))
+  } catch (error) {
+    await t.rollback();
+    return next(new AppError("Something went wrong!", 400));
   }
 });
 
-exports.getMyProjects= catchAsync(async(req, res, next)=>{
+exports.getMyProjects = catchAsync(async (req, res, next) => {
+  const page = req.query.page;
+  const numberOfRecords = await modJob.count();
+  const totalPages = Math.ceil(numberOfRecords / 10);
   const data = await modJob.findAll({
-    where:{userId: req.user.id},
-    attributes: ["id","title","description","price"],
+    where: { userId: req.user.id },
+    offset: (page - 1) * 10,
+    limit: 10,
+    attributes: ["id", "title", "description", "price"],
     include: [
       {
         model: modJobImage,
@@ -84,25 +91,30 @@ exports.getMyProjects= catchAsync(async(req, res, next)=>{
 
   res.status(200).json({
     status: "success",
-    data
-  })
-})
+    info: {
+      totalPages,
+      currentPage: parseInt(page),
+      hasMore: totalPages > parseInt(page),
+    },
+    data,
+  });
+});
 
-exports.removeProjectById = catchAsync(async(req, res, next)=>{
+exports.removeProjectById = catchAsync(async (req, res, next) => {
   const project = await modJob.findOne({
-    where:{
-      id:req.params.id
-    }
-  })
+    where: {
+      id: req.params.id,
+    },
+  });
   if (!project) {
-    return next(new AppError("There is no project with this Id", 400))
+    return next(new AppError("There is no project with this Id", 400));
   }
-  if(project.userId !== req.user.id){
+  if (project.userId !== req.user.id) {
     return next(new AppError("You can only delete your projects", 400));
   }
-  await project.destroy()
+  await project.destroy();
   res.status(200).json({
     status: "success",
     message: "The project was successfully deleted",
   });
-})
+});
