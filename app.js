@@ -14,6 +14,7 @@ const sequelize = require("./db/db_connection");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorControllers");
 const catchAsync = require("./utils/catchAsync");
+var cors = require('cors');
 
 // import middleweares
 var app = express();
@@ -26,6 +27,7 @@ const limiter = rateLimit({
 const swaggerDocument = YAML.load("./utils/swagger.yaml");
 
 // view engine setup
+app.use(cors());
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 app.use("/api", limiter);
