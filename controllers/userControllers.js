@@ -24,7 +24,7 @@ const upload = multer({
 
 exports.uploadUserPhoto = upload.single("img_url");
 
-exports.resizeUserPhoto =catchAsync(async(req, res, next) => {
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
   if (!req.file) return next();
   req.file.filename = `user-${req.user.id}-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
@@ -32,7 +32,7 @@ exports.resizeUserPhoto =catchAsync(async(req, res, next) => {
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
     .toFile(`public/img/users/${req.file.filename}`);
-    next()
+  next();
 });
 
 exports.getUserDetails = catchAsync(async (req, res, next) => {
@@ -50,28 +50,28 @@ exports.getUserDetails = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.updateUserData=catchAsync(async(req, res, next)=>{
-    if(req.body.password || req.body.confirmPassword){
-        return next(new AppError("This route is not for password updates.",400))
-    }
-    const user = await modUser.findOne({
-        where:{
-            id: req.user.id
-        }
-    })
-    const updatedUser = await user.update({
-        ...user,
-        ...req.body
-    })
-    if (req.file) {
-        updatedUser.img_url = req.file.filename
-        await updatedUser.save()
-    }
-    res.status(200).json({
-        status: "success",
-        data: updatedUser
-    })
-})
+exports.updateUserData = catchAsync(async (req, res, next) => {
+  if (req.body.password || req.body.confirmPassword) {
+    return next(new AppError("This route is not for password updates.", 400));
+  }
+  const user = await modUser.findOne({
+    where: {
+      id: req.user.id,
+    },
+  });
+  const updatedUser = await user.update({
+    ...user,
+    ...req.body,
+  });
+  if (req.file) {
+    updatedUser.img_url = req.file.filename;
+    await updatedUser.save();
+  }
+  res.status(200).json({
+    status: "success",
+    data: updatedUser,
+  });
+});
 
 exports.deactiveUser = catchAsync(async (req, res, next) => {
   const user = await modUser.findOne({
@@ -79,48 +79,59 @@ exports.deactiveUser = catchAsync(async (req, res, next) => {
       id: req.user.id,
     },
   });
-  user.active = false
-  await user.save()
+  user.active = false;
+  await user.save();
   res.status(200).json({
     status: "success",
     message: "Your account has been deactivated!",
   });
 });
 
-exports.myServices = catchAsync(async(req, res, next)=>{
+exports.myServices = catchAsync(async (req, res, next) => {
   const services = await modUserService.findAll({
-    where:{
-      userId: req.user.id
+    where: {
+      userId: req.user.id,
     },
-    attributes:[ "userId","serviceId"],
-    include:[
-      {model: modService, attributes:["name"]}
-    ]
-  })
+    attributes: ["userId", "serviceId"],
+    include: [{ model: modService, attributes: ["name"] }],
+  });
   res.status(200).json({
     status: "success",
-    data: services
-  })
-})
+    data: services,
+  });
+});
 
-exports.addNewService = catchAsync(async(req, res, next)=>{
-  const newServiceId = req.body.serviceId
+exports.addNewService = catchAsync(async (req, res, next) => {
+  const newServiceId = req.body.serviceId;
   const service = await modService.findOne({
-    where:{
-      id:newServiceId
+    where: {
+      id: newServiceId,
     },
-  })
-  if(!service){
-    return next(new AppError("this service does not exist", 400))
+  });
+  if (!service) {
+    return next(new AppError("this service does not exist", 400));
   }
   const newService = await modUserService.create({
     userId: req.user.id,
-    serviceId: newServiceId
-  })
+    serviceId: newServiceId,
+  });
   res.status(201).json({
-    status:"success",
-    data: newService
-  })
-})
+    status: "success",
+    data: newService,
+  });
+});
 
-
+exports.getAllUsers = catchAsync(async (req, res, next) => {
+  const users = await modUser.findAll({
+    attributes: {
+      exclude: ["password", "passwordResetToken", "passwordResetExpires"],
+    },
+  });
+  if (!users) {
+    return next(new AppError("No Users found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: users,
+  });
+});

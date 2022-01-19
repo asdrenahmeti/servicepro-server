@@ -10,6 +10,7 @@ const {
   myServices,
   addNewService,
   getUserDetails,
+  getAllUsers,
 } = require("../controllers/userControllers");
 const {
   rateUser,
@@ -24,7 +25,12 @@ const {
   getMyProjects,
   removeProjectById,
 } = require("../controllers/userProjects");
-const { requestJob, requestJobsByUserId, acceptJobRequest, declineJobRequest } = require("../controllers/jobRequest");
+const {
+  requestJob,
+  requestJobsByUserId,
+  acceptJobRequest,
+  declineJobRequest,
+} = require("../controllers/jobRequest");
 
 const upload = multer({ dest: "public/img/users" });
 
@@ -32,10 +38,11 @@ const upload = multer({ dest: "public/img/users" });
 router.post("/rateUser", protect, rateUser);
 router.get("/getRatingsForUsers", getAverageRatingForUsers);
 router.get("/getRatingsForUser/:id", getAverageByMasterId);
-router.get("/getAllReviews/:id", getAllUserReviews)
+router.get("/getAllReviews/:id", getAllUserReviews);
 
 // User Profile
-router.get("/profile", protect, getUserDetails)
+router.get("/", getAllUsers);
+router.get("/profile", protect, getUserDetails);
 router.patch(
   "/updateProfile",
   protect,
@@ -43,8 +50,8 @@ router.patch(
   resizeUserPhoto,
   updateUserData
 );
-router.delete("/deactivateProfile", protect, deactiveUser)
-router.get("/myServices", protect, myServices)
+router.delete("/deactivateProfile", protect, deactiveUser);
+router.get("/myServices", protect, myServices);
 router.post("/addNewUserService", protect, addNewService);
 
 // User projects
@@ -55,13 +62,13 @@ router.post(
   resizeProjectPhotos,
   addNewProject
 );
-router.get("/getMyProjects", protect, getMyProjects)
-router.delete("/post/:id", protect, removeProjectById)
+router.get("/getMyProjects", protect, getMyProjects);
+router.delete("/post/:id", protect, removeProjectById);
 
 // Job Request
-router.post("/newRequest", requestJob)
-router.get("/requestJobs/:id",requestJobsByUserId)
-router.patch("/acceptJob/:id", protect, acceptJobRequest)
+router.post("/newRequest", requestJob);
+router.get("/requestJobs/:id", requestJobsByUserId);
+router.patch("/acceptJob/:id", protect, acceptJobRequest);
 router.patch("/declineJob/:id", protect, declineJobRequest);
 
 module.exports = router;
