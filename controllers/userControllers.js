@@ -140,3 +140,29 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
     data: users,
   });
 });
+
+exports.getUsersByService = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  const users = await modUser.findAll({
+    where: {
+      [Op.or]: [{ role: "INDIVID" }, { role: "COMPANY" }],
+      active: true,
+    },
+    attributes: {
+      exclude: ["password", "passwordResetToken", "passwordResetExpires"],
+    },
+    include: {
+      model: modService,
+      where: {
+        id,
+      },
+    },
+  });
+  if (!users) {
+    return next(new AppError("No Users found", 404));
+  }
+  res.status(200).json({
+    status: "success",
+    data: users,
+  });
+});

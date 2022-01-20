@@ -53,11 +53,13 @@ const userRoutes = require("./routes/userRoutes");
 const auth = require("./routes/auth");
 const subscribeRoutes = require("./routes/subscribeRoutes");
 const servicesRoutes = require("./routes/servicesRoutes");
+const jobsRoutes = require("./routes/jobsRoutes");
 
 app.use("/documentation", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use("/api/user", userRoutes);
 app.use("/api/subscribe", subscribeRoutes);
 app.use("/api/services", servicesRoutes);
+app.use("/api/jobs", jobsRoutes);
 app.use("/api", auth);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

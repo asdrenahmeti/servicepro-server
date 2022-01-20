@@ -2,6 +2,10 @@ const AppError = require("./../utils/appError");
 const catchAsync = require("../utils/catchAsync");
 
 const modService = require("./../models/Service");
+const modUser = require("./../models/User");
+const modUserServices = require("./../models/User_service");
+
+const { Op } = require("sequelize");
 
 exports.getAllServices = catchAsync(async (req, res, next) => {
   const services = await modService.findAll();
@@ -25,9 +29,9 @@ exports.store = catchAsync(async (req, res, next) => {
 exports.remove = catchAsync(async (req, res, next) => {
   const id = req.params.id;
   const service = await modService.findOne({
-      where: {
-          id
-      }
+    where: {
+      id,
+    },
   });
   if (!service) {
     return next(new AppError("There is no service with this id", 404));
@@ -39,19 +43,44 @@ exports.remove = catchAsync(async (req, res, next) => {
   });
 });
 exports.edit = catchAsync(async (req, res, next) => {
-    const id = req.params.id;
-    const service = await modService.findOne({
-      where: {
-        id,
+  const id = req.params.id;
+  const service = await modService.findOne({
+    where: {
+      id,
+    },
+  });
+  if (!service) {
+    return next(new AppError("There is no service with this id", 404));
+  }
+  await service.update(req.body);
+  res.status(200).json({
+    status: "success",
+    message: "Service was updated successfully!",
+    data: service,
+  });
+});
+
+exports.getUsersByServicesAndCities = catchAsync(async (req, res, next) => {
+  const services = req.body.services || [];
+  const cities = req.body.cities || [];
+
+  const users = await modUserServices.findAll({
+    where: {
+      serviceId: {
+        [Op.or]: services,
       },
-    });
-    if (!service) {
-      return next(new AppError("There is no service with this id", 404));
-    }
-    await service.update(req.body);
-    res.status(200).json({
-      status: "success",
-      message: "Service was updated successfully!",
-      data: service
-    });
+    },
+    include: {
+      model: modUser,
+      where: {
+        city: {
+          [Op.or]: cities,
+        },
+      },
+    },
+  });
+  res.status(200).json({
+    status: "success",
+    data: users,
+  });
 });
