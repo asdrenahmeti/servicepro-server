@@ -14,6 +14,12 @@ const User = sequelize.define("user", {
   },
   role: {
     type: Sequelize.ENUM("INDIVID", "COMPANY", "GUEST", "ADMIN"),
+    validate: {
+      isIn: {
+        args: [["INDIVID", "COMPANY", "GUEST", "ADMIN"]],
+        msg: errMessages.en.user.wrong_role,
+      },
+    },
     defaultValue: "GUEST",
   },
   name: {

@@ -12,6 +12,7 @@ const en = {
     country: "Country is required!",
     img_url: "Image is required!",
     role: "Role is required!",
+    wrong_role: "This user role is not allowed!",
     zip_code: "Zip_code is required!",
     adress: "Adress is required!",
   },
@@ -42,7 +43,7 @@ const en = {
     title: "Title is required!",
     description: "Description is required!",
     userId: "UserId is required!",
-    price: "Price is required!"
+    price: "Price is required!",
   },
   job_request: {
     title: "Title is required!",
@@ -60,6 +61,6 @@ const en = {
   },
 };
 const messages = {
-    en
-}
-module.exports = messages
+  en,
+};
+module.exports = messages;

@@ -6,6 +6,7 @@ const catchAsync = require("../utils/catchAsync");
 const multer = require("multer");
 const sharp = require("sharp");
 const { update } = require("../models/Service");
+const { Op } = require("sequelize");
 
 const multerStorage = multer.memoryStorage();
 
@@ -123,6 +124,10 @@ exports.addNewService = catchAsync(async (req, res, next) => {
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
   const users = await modUser.findAll({
+    where: {
+      [Op.or]: [{ role: "INDIVID" }, { role: "COMPANY" }],
+      active: true,
+    },
     attributes: {
       exclude: ["password", "passwordResetToken", "passwordResetExpires"],
     },
