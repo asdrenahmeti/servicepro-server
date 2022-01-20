@@ -14,7 +14,7 @@ const sequelize = require("./db/db_connection");
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorControllers");
 const catchAsync = require("./utils/catchAsync");
-var cors = require('cors');
+var cors = require("cors");
 
 // import middleweares
 var app = express();
@@ -52,10 +52,12 @@ const modJobImage = require("./models/Job_image");
 const userRoutes = require("./routes/userRoutes");
 const auth = require("./routes/auth");
 const subscribeRoutes = require("./routes/subscribeRoutes");
+const servicesRoutes = require("./routes/servicesRoutes");
 
 app.use("/documentation", swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 app.use("/api/user", userRoutes);
 app.use("/api/subscribe", subscribeRoutes);
+app.use("/api/services", servicesRoutes);
 app.use("/api", auth);
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
@@ -78,5 +80,7 @@ app.use(globalErrorHandler);
 //   res.render("error");
 // });
 
-sequelize.sync();
+sequelize.sync({
+  force: false,
+});
 module.exports = app;
