@@ -8,8 +8,10 @@ const {
   remove,
   edit,
   getUsersByServicesAndCities,
+  getTop5
 } = require("./../controllers/services");
 
+router.get("/top5", getTop5)
 router.post("/users", protect, getUsersByServicesAndCities);
 router.get("/:id/users", protect, getUsersByService);
 router.delete("/:id", protect, remove);

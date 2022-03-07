@@ -84,3 +84,17 @@ exports.getUsersByServicesAndCities = catchAsync(async (req, res, next) => {
     data: users,
   });
 });
+
+exports.getTop5 = catchAsync(async (req, res, next) => {
+  const services = await modService.findAll({
+    limit: 5,
+    include: {
+      model: modUser,
+      attributes: ["name", "city", "country", "phone", "img_url"],
+    },
+  });
+  res.status(200).json({
+    status: "success",
+    data: services,
+  });
+});

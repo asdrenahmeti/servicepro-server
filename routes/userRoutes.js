@@ -68,7 +68,7 @@ router.delete("/post/:id", protect, removeProjectById);
 
 // Job Request
 router.post("/newRequest", requestJob);
-router.get("/requestJobs/:id", requestJobsByUserId);
+router.get("/requestJobs",protect, requestJobsByUserId);
 router.patch("/acceptJob/:id", protect, acceptJobRequest);
 router.patch("/declineJob/:id", protect, declineJobRequest);
 

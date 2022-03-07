@@ -41,25 +41,29 @@ exports.resizeProjectPhotos = catchAsync(async (req, res, next) => {
         .jpeg({ quality: 90 })
         .toFile(`public/img/work/${filename}`);
 
-      req.body.img_url.push(filename);
+      req.body.img_url.push({img_url: filename});
     })
   );
   next();
 });
 
 exports.addNewProject = catchAsync(async (req, res, next) => {
-  const t = await sequelize.transaction();
+  const t = await sequelize.transaction(); 
+  if (!req.body.img_url) return next(new AppError("The project must have at least one photo", 400));
   try {
     const project = await modJob.create(
       { ...req.body, userId: req.user.id },
       { transaction: t }
     );
+    
     const jobImageObj = await req.body.img_url.map((next) => {
-      return { img_url: next, jobId: project.id };
+      return { ...next, jobId: project.id };
     });
+    
     const project_images = await modJobImage.bulkCreate(jobImageObj, {
       transaction: t,
     });
+
     t.commit();
     res.status(200).json({
       status: "success",
@@ -68,7 +72,7 @@ exports.addNewProject = catchAsync(async (req, res, next) => {
     });
   } catch (error) {
     await t.rollback();
-    return next(new AppError("Something went wrong!", 400));
+    return next(new AppError(error, 400));
   }
 });
 
@@ -80,7 +84,7 @@ exports.getMyProjects = catchAsync(async (req, res, next) => {
     where: { userId: req.user.id },
     offset: (page - 1) * 10,
     limit: 10,
-    attributes: ["id", "title", "description", "price"],
+    // attributes: ["id", "title", "description", "price"],
     include: [
       {
         model: modJobImage,
@@ -112,9 +116,10 @@ exports.removeProjectById = catchAsync(async (req, res, next) => {
   if (project.userId !== req.user.id) {
     return next(new AppError("You can only delete your projects", 400));
   }
-  await project.destroy();
+  const removed = await project.destroy();
   res.status(200).json({
     status: "success",
     message: "The project was successfully deleted",
+    project: removed
   });
 });

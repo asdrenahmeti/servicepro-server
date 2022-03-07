@@ -121,7 +121,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   const message = `Forgot password? Reset your password in url: ${resetUrl}`;
   try {
     await sendEmail({
-      email: user.email,
+      to: user.email,
       subject: "Your password reset token",
       message,
     });

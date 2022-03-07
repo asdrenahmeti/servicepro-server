@@ -7,6 +7,11 @@ const modUser = require("./../models/User");
 const sendEmail = require("./../utils/email");
 
 exports.requestJob = catchAsync(async (req, res, next) => {
+
+  const { title, userId, description, email } = req.body;
+  if (!title || !description || !userId || !email)
+      return next(new AppError("Please fill all fields!", 400));
+
   const user = await modUser.findOne({
     where: {
       id: req.body.userId,
@@ -40,10 +45,9 @@ exports.requestJob = catchAsync(async (req, res, next) => {
 });
 
 exports.requestJobsByUserId = catchAsync(async (req, res, next) => {
-  const userId = req.params.id;
   const userReuqest = await modJobRequest.findAll({
     where: {
-      userId,
+      userId: req.user.id,
     },
   });
   res.status(200).json({
