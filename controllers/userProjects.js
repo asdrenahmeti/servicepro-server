@@ -30,6 +30,7 @@ exports.uploadProjectPhotos = upload.fields([
 ]);
 
 exports.resizeProjectPhotos = catchAsync(async (req, res, next) => {
+  console.log(req.files)
   if (!req.files.img_url) return next();
   req.body.img_url = [];
   await Promise.all(
@@ -77,13 +78,8 @@ exports.addNewProject = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyProjects = catchAsync(async (req, res, next) => {
-  const page = req.query.page || 1;
-  const numberOfRecords = await modJob.count();
-  const totalPages = Math.ceil(numberOfRecords / 10);
   const data = await modJob.findAll({
     where: { userId: req.user.id },
-    offset: (page - 1) * 20,
-    limit: 20,
     // attributes: ["id", "title", "description", "price"],
     include: [
       {
@@ -95,11 +91,6 @@ exports.getMyProjects = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: "success",
-    info: {
-      totalPages,
-      currentPage: parseInt(page),
-      hasMore: totalPages > parseInt(page),
-    },
     data,
   });
 });

@@ -7,7 +7,8 @@ const multer = require("multer");
 const sharp = require("sharp");
 const { update } = require("../models/Service");
 const { Op } = require("sequelize");
-const fs = require("fs")
+const fs = require("fs");
+const User = require("./../models/User");
 
 const multerStorage = multer.memoryStorage();
 
@@ -171,9 +172,13 @@ exports.getUsersByService = catchAsync(async (req, res, next) => {
 
 exports.profileById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  
+  const user =  await User.findOne({
+    where:{
+      id
+    }
+  })
   res.status(200).json({
     status: "success",
-    data: users,
+    data: user,
   });
 });

@@ -36,8 +36,8 @@ exports.register = catchAsync(async (req, res, next) => {
   }
   const hashPassword = bcrypt.hashSync(password, 12);
   let user = await modUser.create({ ...req.body, password: hashPassword });
-  user.password =undefined
-  user.active=undefined
+  user.password = undefined;
+  user.active = undefined;
   createSendToken(user, 201, res);
 });
 
@@ -170,11 +170,11 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
   let { oldPassword, newPassword, confirmPassword } = req.body;
   if (!oldPassword || !newPassword || !newPassword) {
     return next(
-      new AppError("Please provide old password and new password!", 400)
+      new AppError("Please fill all fields!", 400)
     );
   }
   if (newPassword !== confirmPassword) {
-    return next(new AppError("Passwords are not the same!", 400));
+    return next(new AppError("Passwords do not match!", 400));
   }
   const user = await modUser.findOne({
     where: {
@@ -182,7 +182,14 @@ exports.updatePassword = catchAsync(async (req, res, next) => {
     },
   });
   if (!bcrypt.compareSync(oldPassword, user.password)) {
-    return next(new AppError("Old password it's not correct!", 400));
+    return next(new AppError("Old password is not correct!", 400));
   }
+
+  user.password = bcrypt.hashSync(req.body.newPassword, 12);
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+
+  await user.save();
+
   createSendToken(user, 200, res);
 });

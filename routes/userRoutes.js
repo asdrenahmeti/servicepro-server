@@ -43,7 +43,6 @@ router.get("/getAllReviews/:id", getAllUserReviews);
 
 // User Profile
 router.get("/", getAllUsers);
-router.get("/:id", profileById);
 router.get("/profile", protect, getUserDetails);
 router.patch(
   "/updateProfile",
@@ -51,28 +50,31 @@ router.patch(
   uploadUserPhoto,
   resizeUserPhoto,
   updateUserData
-);
-router.delete("/deactivateProfile", protect, deactiveUser);
-router.get("/myServices", protect, myServices);
-router.post("/addNewUserService", protect, addNewService);
+  );
+  router.delete("/deactivateProfile", protect, deactiveUser);
+  router.get("/myServices", protect, myServices);
+  router.post("/addNewUserService", protect, addNewService);
+  
+  
+  
+  // User projects
+  router.post(
+    "/addNewProject",
+    protect,
+    uploadProjectPhotos,
+    resizeProjectPhotos,
+    addNewProject
+    );
+    router.get("/getMyProjects", protect, getMyProjects);
+    router.delete("/post/:id", protect, removeProjectById);
+    
+    // Job Request
+    router.post("/newRequest", requestJob);
+    router.get("/requestJobs",protect, requestJobsByUserId);
+    router.patch("/acceptJob/:id", protect, acceptJobRequest);
+    router.patch("/declineJob/:id", protect, declineJobRequest);
 
-
-
-// User projects
-router.post(
-  "/addNewProject",
-  protect,
-  uploadProjectPhotos,
-  resizeProjectPhotos,
-  addNewProject
-);
-router.get("/getMyProjects", protect, getMyProjects);
-router.delete("/post/:id", protect, removeProjectById);
-
-// Job Request
-router.post("/newRequest", requestJob);
-router.get("/requestJobs",protect, requestJobsByUserId);
-router.patch("/acceptJob/:id", protect, acceptJobRequest);
-router.patch("/declineJob/:id", protect, declineJobRequest);
-
-module.exports = router;
+    router.get("/:id", profileById);
+    
+    module.exports = router;
+    
