@@ -11,6 +11,7 @@ const {
   addNewService,
   getUserDetails,
   getAllUsers,
+  profileById,
 } = require("../controllers/userControllers");
 const {
   rateUser,
@@ -42,6 +43,7 @@ router.get("/getAllReviews/:id", getAllUserReviews);
 
 // User Profile
 router.get("/", getAllUsers);
+router.get("/:id", profileById);
 router.get("/profile", protect, getUserDetails);
 router.patch(
   "/updateProfile",
@@ -53,6 +55,7 @@ router.patch(
 router.delete("/deactivateProfile", protect, deactiveUser);
 router.get("/myServices", protect, myServices);
 router.post("/addNewUserService", protect, addNewService);
+
 
 
 // User projects

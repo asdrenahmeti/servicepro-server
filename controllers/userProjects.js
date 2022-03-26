@@ -77,13 +77,13 @@ exports.addNewProject = catchAsync(async (req, res, next) => {
 });
 
 exports.getMyProjects = catchAsync(async (req, res, next) => {
-  const page = req.query.page;
+  const page = req.query.page || 1;
   const numberOfRecords = await modJob.count();
   const totalPages = Math.ceil(numberOfRecords / 10);
   const data = await modJob.findAll({
     where: { userId: req.user.id },
-    offset: (page - 1) * 10,
-    limit: 10,
+    offset: (page - 1) * 20,
+    limit: 20,
     // attributes: ["id", "title", "description", "price"],
     include: [
       {

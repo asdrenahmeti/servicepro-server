@@ -7,6 +7,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 const { update } = require("../models/Service");
 const { Op } = require("sequelize");
+const fs = require("fs")
 
 const multerStorage = multer.memoryStorage();
 
@@ -65,6 +66,7 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     ...req.body,
   });
   if (req.file) {
+    if(updatedUser.img_url !== "default.jpg"){fs.unlink(updatedUser.img_url)}
     updatedUser.img_url = req.file.filename;
     await updatedUser.save();
   }
@@ -161,6 +163,15 @@ exports.getUsersByService = catchAsync(async (req, res, next) => {
   if (!users) {
     return next(new AppError("No Users found", 404));
   }
+  res.status(200).json({
+    status: "success",
+    data: users,
+  });
+});
+
+exports.profileById = catchAsync(async (req, res, next) => {
+  const { id } = req.params;
+  
   res.status(200).json({
     status: "success",
     data: users,
