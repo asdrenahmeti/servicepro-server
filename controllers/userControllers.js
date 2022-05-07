@@ -9,6 +9,9 @@ const { update } = require("../models/Service");
 const { Op } = require("sequelize");
 const fs = require("fs");
 const User = require("./../models/User");
+const modRating = require("./../models/Rating");
+const modJob = require("./../models/Job");
+const sequelize = require("./../db/db_connection");
 
 const multerStorage = multer.memoryStorage();
 
@@ -67,7 +70,9 @@ exports.updateUserData = catchAsync(async (req, res, next) => {
     ...req.body,
   });
   if (req.file) {
-    if(updatedUser.img_url !== "default.jpg"){fs.unlink(updatedUser.img_url)}
+    if (updatedUser.img_url !== "default.jpg") {
+      fs.unlink(updatedUser.img_url);
+    }
     updatedUser.img_url = req.file.filename;
     await updatedUser.save();
   }
@@ -172,13 +177,33 @@ exports.getUsersByService = catchAsync(async (req, res, next) => {
 
 exports.profileById = catchAsync(async (req, res, next) => {
   const { id } = req.params;
-  const user =  await User.findOne({
-    where:{
-      id
-    }
-  })
+  let user = await User.findOne({
+    where: {
+      id,
+    },
+    attributes: ["id", "name", "bio"],
+    include: [
+      { model: modService, attributes: ["id", "name"] },
+      {
+        model: modJob,
+        attributes: {
+          exclude: ["createdAt", "updatedAt"],
+        },
+      },
+    ],
+  });
+  const userRatings = await modRating.findOne({
+    where: {
+      masterId: id,
+    },
+    attributes: [
+      [sequelize.fn("count", sequelize.col("rating_value")), "reviews"],
+      [sequelize.fn("avg", sequelize.col("rating_value")), "rating"],
+    ],
+  });
+
   res.status(200).json({
     status: "success",
-    data: user,
+    data: { user, userRatings },
   });
 });

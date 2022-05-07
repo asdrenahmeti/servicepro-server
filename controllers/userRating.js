@@ -59,16 +59,16 @@ exports.getAverageRatingForUsers = catchAsync(async (req, res, next) => {
 // average rate based on id
 exports.getAverageByMasterId = catchAsync(async (req, res, next) => {
   const user = await modUser.findOne({
-    where:{
-      id: req.params.id
-    }
-  })
+    where: {
+      id: req.params.id,
+    },
+  });
   if (!user) {
     return next(new AppError("user with this id does not exist!", 400));
   }
   const userRatings = await modRating.findAll({
     where: {
-        masterId: req.params.id
+      masterId: req.params.id,
     },
     attributes: [
       "masterId",
@@ -98,13 +98,13 @@ exports.getAverageByMasterId = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.getAllUserReviews = catchAsync(async(req, res, next)=>{
-  const masterId = req.params.id
+exports.getAllUserReviews = catchAsync(async (req, res, next) => {
+  const masterId = req.params.id;
   const user = await modUser.findOne({
-    where:{
-      id:masterId
-    }
-  })
+    where: {
+      id: masterId,
+    },
+  });
   if (!user) {
     return next(new AppError("user with this id does not exist!", 400));
   }
@@ -112,7 +112,7 @@ exports.getAllUserReviews = catchAsync(async(req, res, next)=>{
     where: {
       masterId,
     },
-    attributes:["id","rating_value", "rating_quote"],
+    attributes: ["id", "rating_value", "rating_quote"],
     include: [
       {
         model: modUser,
@@ -128,6 +128,6 @@ exports.getAllUserReviews = catchAsync(async(req, res, next)=>{
   });
   res.status(200).json({
     status: "success",
-    data
+    data,
   });
-})
+});

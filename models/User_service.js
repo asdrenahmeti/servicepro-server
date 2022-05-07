@@ -25,23 +25,22 @@ const User_service = sequelize.define(
   }
 );
 
-User.hasMany(User_service)
-User_service.belongsTo(User)
+User.hasMany(User_service);
+User_service.belongsTo(User);
 Service.hasMany(User_service);
 User_service.belongsTo(Service);
 
-User.belongsToMany(Service,{
-    through:{
-        model: User_service,
-        unique: false
-    }
-})
+User.belongsToMany(Service, {
+  through: {
+    model: User_service,
+    unique: false,
+  },
+});
 Service.belongsToMany(User, {
   through: {
     model: User_service,
     unique: false,
   },
 });
-
 
 module.exports = User_service;

@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
 const sequelize = require("../db/db_connection");
 const User = require("./User");
-const errMessages = require("./../validators/messages")
+const errMessages = require("./../validators/messages");
 
 const Job = sequelize.define("job", {
   id: {
@@ -38,13 +38,13 @@ const Job = sequelize.define("job", {
   },
 });
 
-User.hasOne(Job,{
+User.hasMany(Job, {
   foreignKey: {
     allowNull: false,
   },
 });
 Job.belongsTo(User, {
-  foreignKey: { 
+  foreignKey: {
     allowNull: false,
   },
 });

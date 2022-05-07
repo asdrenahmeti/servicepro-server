@@ -6,6 +6,7 @@ const modUser = require("./../models/User");
 const modUserServices = require("./../models/User_service");
 
 const { Op } = require("sequelize");
+const sequelize = require("sequelize");
 
 exports.getAllServices = catchAsync(async (req, res, next) => {
   const services = await modService.findAll();
@@ -86,13 +87,30 @@ exports.getUsersByServicesAndCities = catchAsync(async (req, res, next) => {
 });
 
 exports.getTop5 = catchAsync(async (req, res, next) => {
+  const servicesIds = await modUserServices
+    .findAll({
+      attributes: [
+        "serviceId",
+        [sequelize.fn("COUNT", sequelize.col("serviceId")), "count_services"],
+      ],
+      group: "serviceId",
+      order: [[sequelize.col("count_services"), "DESC"]],
+      limit: 5,
+    })
+    .map((item) => item.serviceId);
+
   const services = await modService.findAll({
-    limit: 5,
+    where: {
+      id: {
+        [sequelize.Op.in]: servicesIds,
+      },
+    },
     include: {
       model: modUser,
       attributes: ["name", "city", "country", "phone", "img_url"],
     },
   });
+
   res.status(200).json({
     status: "success",
     data: services,
